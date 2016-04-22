@@ -1,0 +1,58 @@
+#!/bin/bash
+#
+# Bash script for check_mk using hyg-usb v0.1 from Macareux Labs.
+# https://github.com/macareux-labs/hyg-usb_linux
+#
+# The data is returned to the script, and 2 threshold are setup : WARNING and ALARM.
+#
+# 0 is OK
+# 1 is WARNING
+# 2 is critical
+#
+#
+# HOWTO :
+# ((Data is printed as <<local>> if your run check_mk -d in console))
+#
+# 1) Place this script into your check_mk plugin, on the hosts where the hyg-usb is pluged
+#   => Example: /usr/lib/check_mk_agent/local
+#
+# 2) Check eXecutable : chmod +x hyg_temp
+#
+# 3) Setup the service in check_mk
+#
+#
+# LICENCE
+# This project is placed under the MIT License. See LICENSE file for details
+#
+#
+
+####################################
+# SETUP HERE
+#
+#
+# Temperature for the WARNING
+WARNING=40
+# Temperature for the ALARM
+CRITICAL=45
+# Path for the binary
+HYG_USB_PATH="/opt/hyg-usb"
+#
+#
+# End of SETUP
+####################################
+
+TEMP_LONG=`${HYG_USB_PATH}/hyg-usb -T | awk '{print $4}' |  cut -c1-5`
+TEMP_SHORT=${TEMP_LONG%.*}
+
+if [ $TEMP_SHORT -lt 40 ]; then
+        status=0
+        statustxt=OK
+elif [ $TEMP_SHORT -lt 45 ]; then
+        status=1
+        statustxt=WARNING
+        else
+        status=2
+        statustxt=CRITICAL
+fi
+
+echo "$status Temperature temp=$TEMP_LONG $statusok- $TEMP_LONG catched and $TEMP_SHORT returned."
